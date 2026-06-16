@@ -1,6 +1,5 @@
 import React from "react";
 
-// Sprite sheet paths - each image has 4 frames
 const spriteSheets = {
   idle: "/character/mage_idle1.png",
   down: "/character/walk_down.png",
@@ -9,20 +8,18 @@ const spriteSheets = {
   up: "/character/walk_up.png",
 };
 
-// Frame count per sprite sheet (adjust based on your images)
 const frameCounts = {
-  idle: 2, // 4 frames in idle image
-  down: 4, // 4 frames in walk_down
-  left: 5, // 4 frames in walk_left
-  right: 5, // 4 frames in walk_right
-  up: 4, // 4 frames in walk_up
+  idle: 2,
+  down: 4,
+  left: 5,
+  right: 5,
+  up: 4,
 };
 
-// Frame size in pixels (adjust based on your sprite size)
 const FRAME_WIDTH = 64;
 const FRAME_HEIGHT = 64;
 
-const Character = ({ position, direction, isMoving }) => {
+const Character = ({ position, direction, isMoving, scale: propScale }) => {
   const [currentFrame, setCurrentFrame] = React.useState(0);
 
   // Animate frames when moving
@@ -34,7 +31,7 @@ const Character = ({ position, direction, isMoving }) => {
 
     const interval = setInterval(() => {
       setCurrentFrame((prev) => (prev + 1) % frameCounts[direction]);
-    }, 200); // Change frame every 200ms
+    }, 200);
 
     return () => clearInterval(interval);
   }, [isMoving, direction]);
@@ -42,10 +39,10 @@ const Character = ({ position, direction, isMoving }) => {
   const spriteSheet = spriteSheets[isMoving ? direction : "idle"];
   const frameCount = frameCounts[isMoving ? direction : "idle"];
 
-  // Calculate which part of the sprite sheet to show
-  // backgroundPosition shifts the visible area
   const backgroundPositionX = -(currentFrame * FRAME_WIDTH);
-  const SCALE = 1.3;
+
+  // Use prop scale if provided, otherwise default 1.3
+  const SCALE = propScale || 1.3;
 
   return (
     <div
@@ -59,9 +56,9 @@ const Character = ({ position, direction, isMoving }) => {
         backgroundPosition: `${backgroundPositionX}px 0px`,
         backgroundSize: `${frameCount * FRAME_WIDTH}px ${FRAME_HEIGHT}px`,
         transform: `scale(${SCALE})`,
+        transformOrigin: "top left",
         backgroundRepeat: "no-repeat",
         imageRendering: "pixelated",
-        // transform: direction === "left" ? "scaleX(-1)" : "scaleX(1)",
         zIndex: 10,
       }}
     />

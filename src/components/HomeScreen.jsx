@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Character from "./Character";
 import Folder from "./Folder";
 import {
@@ -10,47 +10,112 @@ import FlyingBird from "./flyingbird";
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 400;
 
-const folders = [
+const baseFolders = [
   {
     id: "about",
     label: "About Me",
     color: "blue",
-    position: { x: 100, y: 260 },
+    basePosition: { x: 100, y: 260 },
     path: "/about",
   },
   {
     id: "portfolio",
     label: "Portfolio",
     color: "red",
-    position: { x: 360, y: 260 },
+    basePosition: { x: 360, y: 260 },
     path: "/portfolio",
   },
   {
     id: "contact",
     label: "Contact Me",
     color: "yellow",
-    position: { x: 620, y: 260 },
+    basePosition: { x: 620, y: 260 },
     path: "/contact",
   },
 ];
 
+const isMobileDevice = () => {
+  return (
+    window.innerWidth < 768 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    )
+  );
+};
+
 const HomeScreen = ({ onNavigate }) => {
-  const { position, direction, isMoving } = useKeyboardMovement(4, {
+  const [isMobile, setIsMobile] = useState(isMobileDevice());
+  const gameAreaRef = useRef(null);
+  const [scale, setScale] = useState(1);
+  const [gameBounds, setGameBounds] = useState({
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(isMobileDevice());
+      if (gameAreaRef.current) {
+        const rect = gameAreaRef.current.getBoundingClientRect();
+        setScale(rect.width / GAME_WIDTH);
+        setGameBounds({ width: rect.width, height: rect.height });
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Minimum scale for folders so they don't get too tiny
+  const folderScale = Math.max(scale, 0.85);
+  const charScale = Math.max(scale * 1.4, 1.2);
+
+  // Calculate folder positions
+  const getMobileX = (index, total, containerWidth) => {
+    const spacing = containerWidth / (total + 1);
+    return spacing * (index + 1) - 40 * folderScale;
+  };
+
+  const folders = baseFolders.map((folder, index) => {
+    const containerWidth =
+      gameAreaRef.current?.offsetWidth || GAME_WIDTH * scale;
+    const containerHeight =
+      gameAreaRef.current?.offsetHeight || GAME_HEIGHT * scale;
+
+    return {
+      ...folder,
+      position: {
+        x: isMobile
+          ? getMobileX(index, baseFolders.length, containerWidth)
+          : folder.basePosition.x * scale,
+        y: isMobile
+          ? containerHeight - 80 - folderScale * 20
+          : folder.basePosition.y * scale,
+      },
+    };
+  });
+
+  const { position, direction, isMoving, touchHandlers } = useKeyboardMovement(
+    4,
+    gameBounds,
+  );
   const [highlightedFolder, setHighlightedFolder] = useState(null);
   const [collisionTimer, setCollisionTimer] = useState(0);
 
   useEffect(() => {
-    const charRect = { x: position.x, y: position.y, width: 64, height: 64 };
+    const charRect = {
+      x: position.x,
+      y: position.y,
+      width: 64 * charScale,
+      height: 64 * charScale,
+    };
     let collidedFolder = null;
     folders.forEach((folder) => {
       const folderRect = {
         x: folder.position.x,
         y: folder.position.y,
-        width: 80,
-        height: 80,
+        width: 80 * folderScale,
+        height: 80 * folderScale,
       };
       if (checkCollision(charRect, folderRect)) {
         collidedFolder = folder;
@@ -71,7 +136,7 @@ const HomeScreen = ({ onNavigate }) => {
     } else {
       setCollisionTimer(0);
     }
-  }, [position, onNavigate]);
+  }, [position, onNavigate, folders, charScale, folderScale]);
 
   const handleFolderClick = useCallback(
     (path) => {
@@ -91,7 +156,6 @@ const HomeScreen = ({ onNavigate }) => {
         textAlign: "center",
       }}
     >
-      {/* Background image at very back */}
       <img
         src="/omm.png"
         alt="Pixel scenery"
@@ -108,7 +172,6 @@ const HomeScreen = ({ onNavigate }) => {
         }}
       />
 
-      {/* Content layer - zIndex 1 */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <h1
           className="home-title"
@@ -137,27 +200,37 @@ const HomeScreen = ({ onNavigate }) => {
             textAlign: "center",
           }}
         >
-          Use WASD or Arrow Keys to move
+          {isMobile ? "Swipe to move" : "Use WASD or Arrow Keys to move"}
         </div>
 
-        {/* Game box - zIndex 2, ABOVE background */}
         <div
+          ref={gameAreaRef}
           className="game-area"
           style={{
-            width: GAME_WIDTH,
-            height: GAME_HEIGHT,
             position: "relative",
             margin: "0 auto",
             backgroundColor: "#ffffff",
             border: "2px solid #333",
             textAlign: "left",
             zIndex: 2,
+            touchAction: "none",
+            userSelect: "none",
+            overflow: "hidden",
           }}
+          {...touchHandlers}
         >
+          <FlyingBird
+            wingClosed="/close.png"
+            wingOpen="/open.png"
+            speed={1}
+            startY={180}
+            scale={4}
+          />
           <Character
             position={position}
             direction={direction}
             isMoving={isMoving}
+            scale={charScale}
           />
           {folders.map((folder) => (
             <Folder
@@ -165,6 +238,7 @@ const HomeScreen = ({ onNavigate }) => {
               label={folder.label}
               color={folder.color}
               position={folder.position}
+              scale={folderScale}
               isHighlighted={highlightedFolder?.id === folder.id}
               onClick={() => handleFolderClick(folder.path)}
             />
@@ -174,9 +248,9 @@ const HomeScreen = ({ onNavigate }) => {
               style={{
                 position: "absolute",
                 left: highlightedFolder.position.x,
-                top: highlightedFolder.position.y - 20,
-                width: 80,
-                height: 6,
+                top: highlightedFolder.position.y - 20 * folderScale,
+                width: 80 * folderScale,
+                height: 6 * folderScale,
                 background: "#ddd",
                 border: "2px solid #333",
               }}
@@ -193,22 +267,6 @@ const HomeScreen = ({ onNavigate }) => {
           )}
         </div>
       </div>
-
-      {/* Bird - OUTSIDE content layer, zIndex between background and game box */}
-      <FlyingBird
-        wingClosed="/close.png"
-        wingOpen="/open.png"
-        speed={1}
-        startY={180}
-        scale={4}
-      />
-      {/* <FlyingBird
-        wingClosed="/close.png"
-        wingOpen="/open.png"
-        speed={1}
-        startY={160}
-        scale={4}
-      /> */}
     </div>
   );
 };

@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const FlyingBird = ({
-  wingClosed = "/close.png", // Wings closed image
-  wingOpen = "/open.png", // Wings open image
-  speed = 1,
+  wingClosed = "/close.png",
+  wingOpen = "/open.png",
+  speed = 2,
   startY = 50,
   scale = 4,
 }) => {
   const [position, setPosition] = useState({ x: -100, y: startY });
-  const [wingState, setWingState] = useState(false); // false = closed, true = open
+  const [wingState, setWingState] = useState(false);
+  const animationRef = useRef(null);
+  const lastTimeRef = useRef(0);
 
   useEffect(() => {
-    let animationId;
-    let lastTime = 0;
-    const flapInterval = 200; // ms between wing flaps
-
     const animate = (timestamp) => {
-      if (!lastTime) lastTime = timestamp;
-      const delta = timestamp - lastTime;
+      if (!lastTimeRef.current) lastTimeRef.current = timestamp;
+      const delta = timestamp - lastTimeRef.current;
 
       // Move position
       setPosition((prev) => {
@@ -31,18 +29,23 @@ const FlyingBird = ({
         return { x: newX, y: newY };
       });
 
-      // Flap wings
-      if (delta > flapInterval) {
+      // Flap wings every 200ms
+      if (delta > 200) {
         setWingState((prev) => !prev);
-        lastTime = timestamp;
+        lastTimeRef.current = timestamp;
       }
 
-      animationId = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    animationId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationId);
-  }, [speed, startY, scale]);
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [speed, startY]); // Only re-run if speed or startY changes
 
   const currentImage = wingState ? wingOpen : wingClosed;
 
@@ -52,7 +55,7 @@ const FlyingBird = ({
         position: "fixed",
         left: position.x,
         top: position.y,
-        zIndex: 1,
+        zIndex: 0,
         pointerEvents: "none",
         width: 16 * scale,
         height: 16 * scale,

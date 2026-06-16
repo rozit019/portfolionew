@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavigateButton from "./NavigateButton";
 
 const skills = [
@@ -56,8 +56,20 @@ const certificates = [
   },
 ];
 
+// Detect mobile
+const isMobileDevice = () => {
+  return window.innerWidth < 768;
+};
+
 const AboutMe = ({ onNavigate }) => {
+  const [isMobile, setIsMobile] = useState(isMobileDevice());
   const [selectedCertificate, setSelectedCertificate] = useState(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(isMobileDevice());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const openModal = (cert) => {
     setSelectedCertificate(cert);
@@ -71,7 +83,7 @@ const AboutMe = ({ onNavigate }) => {
     <div
       className="section-page"
       style={{
-        padding: "40px 60px",
+        padding: isMobile ? "20px" : "40px 60px",
         maxWidth: 1100,
         position: "relative",
         minHeight: "100vh",
@@ -102,7 +114,11 @@ const AboutMe = ({ onNavigate }) => {
         {/* Title */}
         <h1
           className="section-title"
-          style={{ fontSize: "32px", marginBottom: 40, textAlign: "center" }}
+          style={{
+            fontSize: isMobile ? "20px" : "32px",
+            marginBottom: isMobile ? 20 : 40,
+            textAlign: "center",
+          }}
         >
           About Me
         </h1>
@@ -111,12 +127,13 @@ const AboutMe = ({ onNavigate }) => {
         <div
           className="section-content"
           style={{
-            fontSize: "14px",
+            fontSize: isMobile ? "10px" : "14px",
             lineHeight: 2.5,
             color: "#444",
             textAlign: "center",
             maxWidth: 700,
             margin: "0 auto 60px",
+            padding: isMobile ? "0 10px" : 0,
           }}
         >
           <p>Hi, my name is Rojit Aryal.</p>
@@ -129,13 +146,13 @@ const AboutMe = ({ onNavigate }) => {
         </div>
 
         {/* Skills Section */}
-        <div style={{ marginBottom: 80 }}>
+        <div style={{ marginBottom: isMobile ? 40 : 80 }}>
           <h2
             style={{
-              fontSize: "20px",
+              fontSize: isMobile ? "14px" : "20px",
               color: "#333",
               textAlign: "center",
-              marginBottom: 40,
+              marginBottom: isMobile ? 20 : 40,
               fontFamily: "'Press Start 2P', cursive",
             }}
           >
@@ -145,8 +162,8 @@ const AboutMe = ({ onNavigate }) => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 30,
+              gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+              gap: isMobile ? 15 : 30,
               maxWidth: 800,
               margin: "0 auto",
             }}
@@ -157,7 +174,7 @@ const AboutMe = ({ onNavigate }) => {
                 style={{
                   background: "#fff",
                   border: "3px solid #333",
-                  padding: 25,
+                  padding: isMobile ? 15 : 25,
                   boxShadow: "4px 4px 0 rgba(0,0,0,0.2)",
                   transition: "all 0.3s ease",
                   cursor: "default",
@@ -184,13 +201,13 @@ const AboutMe = ({ onNavigate }) => {
                   <i
                     className={skill.icon}
                     style={{
-                      fontSize: 28,
+                      fontSize: isMobile ? 20 : 28,
                       color: skill.color,
                     }}
                   />
                   <h3
                     style={{
-                      fontSize: "14px",
+                      fontSize: isMobile ? "10px" : "14px",
                       color: "#333",
                       fontFamily: "'Press Start 2P', cursive",
                     }}
@@ -212,7 +229,7 @@ const AboutMe = ({ onNavigate }) => {
                         background: skill.color + "20",
                         color: skill.color,
                         padding: "5px 10px",
-                        fontSize: "10px",
+                        fontSize: isMobile ? "8px" : "10px",
                         border: `2px solid ${skill.color}`,
                         fontFamily: "'Press Start 2P', cursive",
                       }}
@@ -230,10 +247,10 @@ const AboutMe = ({ onNavigate }) => {
         <div>
           <h2
             style={{
-              fontSize: "20px",
+              fontSize: isMobile ? "14px" : "20px",
               color: "#333",
               textAlign: "center",
-              marginBottom: 40,
+              marginBottom: isMobile ? 20 : 40,
               fontFamily: "'Press Start 2P', cursive",
             }}
           >
@@ -243,8 +260,8 @@ const AboutMe = ({ onNavigate }) => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 30,
+              gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+              gap: isMobile ? 15 : 30,
               maxWidth: 800,
               margin: "0 auto",
             }}
@@ -271,7 +288,13 @@ const AboutMe = ({ onNavigate }) => {
                   e.currentTarget.style.boxShadow = "4px 4px 0 rgba(0,0,0,0.2)";
                 }}
               >
-                <div style={{ width: "100%", height: 200, overflow: "hidden" }}>
+                <div
+                  style={{
+                    width: "100%",
+                    height: isMobile ? 150 : 200,
+                    overflow: "hidden",
+                  }}
+                >
                   <img
                     src={cert.image}
                     alt={cert.title}
@@ -290,10 +313,10 @@ const AboutMe = ({ onNavigate }) => {
                     }}
                   />
                 </div>
-                <div style={{ padding: 20 }}>
+                <div style={{ padding: isMobile ? 12 : 20 }}>
                   <h3
                     style={{
-                      fontSize: "12px",
+                      fontSize: isMobile ? "10px" : "12px",
                       color: "#333",
                       marginBottom: 10,
                       fontFamily: "'Press Start 2P', cursive",
@@ -307,7 +330,7 @@ const AboutMe = ({ onNavigate }) => {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      fontSize: "10px",
+                      fontSize: isMobile ? "8px" : "10px",
                       color: "#666",
                       fontFamily: "'Press Start 2P', cursive",
                     }}
@@ -322,7 +345,7 @@ const AboutMe = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* CERTIFICATE MODAL - Opens when clicked */}
+      {/* CERTIFICATE MODAL */}
       {selectedCertificate && (
         <div
           style={{
@@ -336,11 +359,12 @@ const AboutMe = ({ onNavigate }) => {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1000,
-            padding: 20,
+            padding: isMobile ? 10 : 20,
           }}
           onClick={closeModal}
         >
           <div
+            className="modal-content"
             style={{
               background: "#f5f5f5",
               border: "4px solid #333",
@@ -354,7 +378,6 @@ const AboutMe = ({ onNavigate }) => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
             <button
               onClick={closeModal}
               style={{
@@ -365,7 +388,7 @@ const AboutMe = ({ onNavigate }) => {
                 color: "white",
                 border: "3px solid #333",
                 fontFamily: "'Press Start 2P', cursive",
-                fontSize: "12px",
+                fontSize: isMobile ? "10px" : "12px",
                 padding: "8px 12px",
                 cursor: "pointer",
                 zIndex: 10,
@@ -383,11 +406,10 @@ const AboutMe = ({ onNavigate }) => {
               ✕
             </button>
 
-            {/* Full Certificate Image */}
             <div
               style={{
                 width: "100%",
-                maxHeight: 500,
+                maxHeight: isMobile ? 300 : 500,
                 overflow: "hidden",
                 borderBottom: "4px solid #333",
                 background: "#fff",
@@ -405,11 +427,10 @@ const AboutMe = ({ onNavigate }) => {
               />
             </div>
 
-            {/* Certificate Details */}
-            <div style={{ padding: 30 }}>
+            <div style={{ padding: isMobile ? 15 : 30 }}>
               <h2
                 style={{
-                  fontSize: "20px",
+                  fontSize: isMobile ? "14px" : "20px",
                   color: "#333",
                   marginBottom: 15,
                   fontFamily: "'Press Start 2P', cursive",
@@ -421,7 +442,7 @@ const AboutMe = ({ onNavigate }) => {
 
               <p
                 style={{
-                  fontSize: "12px",
+                  fontSize: isMobile ? "10px" : "12px",
                   lineHeight: 2,
                   color: "#555",
                   marginBottom: 20,
@@ -436,11 +457,13 @@ const AboutMe = ({ onNavigate }) => {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  padding: "15px 20px",
+                  padding: isMobile ? "10px 15px" : "15px 20px",
                   background: "#fff",
                   border: "3px solid #333",
                   fontFamily: "'Press Start 2P', cursive",
-                  fontSize: "10px",
+                  fontSize: isMobile ? "8px" : "10px",
+                  flexWrap: "wrap",
+                  gap: 10,
                 }}
               >
                 <span style={{ color: "#666" }}>

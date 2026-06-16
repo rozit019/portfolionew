@@ -30,16 +30,28 @@ const projects = [
     description:
       "Graphics and motion design works created using Photoshop, Illustrator, and Premiere Pro.",
     link: "https://drive.google.com/drive/folders/1_aO6yzPQlZsG1fzBdEE1SORDaBDAfbaW",
-    tech: ["Vue.js", "Express"],
+    tech: ["Photoshop", "Premiere Pro", "Illustrator"],
   },
 ];
+
+// Detect mobile
+const isMobileDevice = () => {
+  return window.innerWidth < 768;
+};
 
 // Character animation component
 const WalkingCharacter = () => {
   const [currentFrame, setCurrentFrame] = useState(0);
+  const [isMobile, setIsMobile] = useState(isMobileDevice());
   const FRAME_WIDTH = 64;
   const FRAME_HEIGHT = 64;
   const TOTAL_FRAMES = 4;
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(isMobileDevice());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,6 +61,7 @@ const WalkingCharacter = () => {
   }, []);
 
   const backgroundPositionX = -(currentFrame * FRAME_WIDTH);
+  const scale = isMobile ? 1.2 : 2; // Smaller on mobile
 
   return (
     <div
@@ -60,7 +73,7 @@ const WalkingCharacter = () => {
         backgroundSize: `${TOTAL_FRAMES * FRAME_WIDTH}px ${FRAME_HEIGHT}px`,
         backgroundRepeat: "no-repeat",
         imageRendering: "pixelated",
-        transform: "scale(2)",
+        transform: `scale(${scale})`,
         transformOrigin: "top left",
       }}
     />
@@ -112,14 +125,18 @@ const Portfolio = ({ onNavigate }) => {
 
         {/* Header */}
         <div
+          className="portfolio-header"
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
             marginTop: 20,
+            flexWrap: "wrap",
+            gap: 20,
           }}
         >
           <h1
+            className="portfolio-title"
             style={{
               fontSize: "48px",
               color: "#4A90E2",
@@ -131,7 +148,7 @@ const Portfolio = ({ onNavigate }) => {
             <br />
             Aryal
           </h1>
-          <div style={{ textAlign: "right" }}>
+          <div className="portfolio-subtitle" style={{ textAlign: "right" }}>
             <p
               style={{
                 fontSize: "10px",
@@ -156,17 +173,20 @@ const Portfolio = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Main Content: Character Left + Projects Right */}
+        {/* Main Content */}
         <div
+          className="portfolio-content"
           style={{
             display: "flex",
             gap: 60,
             marginTop: 40,
             alignItems: "flex-start",
+            flexWrap: "wrap",
           }}
         >
           {/* LEFT SIDE - Walking Character */}
           <div
+            className="portfolio-character"
             style={{
               width: 200,
               display: "flex",
@@ -196,7 +216,10 @@ const Portfolio = ({ onNavigate }) => {
           </div>
 
           {/* RIGHT SIDE - Project Stack */}
-          <div className="portfolio-stack" style={{ flex: 1, marginTop: 20 }}>
+          <div
+            className="portfolio-stack"
+            style={{ flex: 1, marginTop: 20, minWidth: 300 }}
+          >
             {projects.map((project, index) => (
               <div
                 key={project.id}
@@ -268,6 +291,7 @@ const Portfolio = ({ onNavigate }) => {
           onClick={closeModal}
         >
           <div
+            className="modal-content"
             style={{
               background: "#f5f5f5",
               border: "4px solid #333",
@@ -301,6 +325,7 @@ const Portfolio = ({ onNavigate }) => {
             </button>
 
             <div
+              className="modal-image"
               style={{
                 width: "100%",
                 height: 400,
@@ -320,7 +345,7 @@ const Portfolio = ({ onNavigate }) => {
               />
             </div>
 
-            <div style={{ padding: 30 }}>
+            <div className="modal-body" style={{ padding: 30 }}>
               <h2
                 style={{
                   fontSize: "24px",
@@ -371,6 +396,7 @@ const Portfolio = ({ onNavigate }) => {
                   href={selectedProject.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="modal-link"
                   style={{
                     display: "inline-block",
                     background: "#2ECC71",
@@ -381,6 +407,7 @@ const Portfolio = ({ onNavigate }) => {
                     fontFamily: "'Press Start 2P', cursive",
                     textDecoration: "none",
                     boxShadow: "3px 3px 0 #333",
+                    wordBreak: "break-all",
                   }}
                 >
                   {selectedProject.link}

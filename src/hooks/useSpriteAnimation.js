@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export const useSpriteAnimation = (
   frames,
@@ -28,7 +28,6 @@ export const useKeyboardMovement = (
   bounds = { width: 800, height: 400 },
   characterSize = { width: 64, height: 64 },
 ) => {
-  // Calculate center position dynamically based on bounds and character size
   const centerX = Math.floor((bounds.width - characterSize.width) / 2);
   const centerY = Math.floor((bounds.height - characterSize.height - 100) / 2);
 
@@ -36,6 +35,18 @@ export const useKeyboardMovement = (
   const [direction, setDirection] = useState("down");
   const [isMoving, setIsMoving] = useState(false);
   const [keys, setKeys] = useState({});
+
+  // Reset position when bounds change (mobile resize)
+  useEffect(() => {
+    const newCenterX = Math.floor((bounds.width - characterSize.width) / 2);
+    const newCenterY = Math.floor(
+      (bounds.height - characterSize.height - 100) / 2,
+    );
+    setPosition({ x: newCenterX, y: newCenterY });
+  }, [bounds.width, bounds.height, characterSize.width, characterSize.height]);
+
+  // Swipe state
+  const touchStartRef = useRef(null);
 
   const handleKeyDown = useCallback((e) => {
     setKeys((prev) => ({ ...prev, [e.key]: true }));
@@ -45,6 +56,70 @@ export const useKeyboardMovement = (
     setKeys((prev) => ({ ...prev, [e.key]: false }));
   }, []);
 
+  // Swipe handlers - no preventDefault (use CSS touch-action: none instead)
+  const handleTouchStart = useCallback((e) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
+
+  const handleTouchMove = useCallback(
+    (e) => {
+      if (!touchStartRef.current) return;
+      // REMOVED: e.preventDefault() - causes passive event error
+
+      const touch = e.touches[0];
+      const dx = touch.clientX - touchStartRef.current.x;
+      const dy = touch.clientY - touchStartRef.current.y;
+
+      const threshold = 10;
+
+      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+        setPosition((prev) => {
+          let newX = prev.x;
+          let newY = prev.y;
+          let newDirection = direction;
+
+          if (Math.abs(dx) > Math.abs(dy)) {
+            if (dx > 0) {
+              newX = Math.min(
+                bounds.width - characterSize.width,
+                prev.x + speed,
+              );
+              newDirection = "right";
+            } else {
+              newX = Math.max(0, prev.x - speed);
+              newDirection = "left";
+            }
+          } else {
+            if (dy > 0) {
+              newY = Math.min(
+                bounds.height - characterSize.height,
+                prev.y + speed,
+              );
+              newDirection = "down";
+            } else {
+              newY = Math.max(0, prev.y - speed);
+              newDirection = "up";
+            }
+          }
+
+          setDirection(newDirection);
+          setIsMoving(true);
+          return { x: newX, y: newY };
+        });
+
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+      }
+    },
+    [speed, bounds, direction, characterSize.width, characterSize.height],
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    touchStartRef.current = null;
+    setIsMoving(false);
+  }, []);
+
+  // Keyboard listeners
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
@@ -54,6 +129,7 @@ export const useKeyboardMovement = (
     };
   }, [handleKeyDown, handleKeyUp]);
 
+  // Keyboard movement loop
   useEffect(() => {
     const moveInterval = setInterval(() => {
       setPosition((prev) => {
@@ -99,7 +175,16 @@ export const useKeyboardMovement = (
     characterSize.height,
   ]);
 
-  return { position, direction, isMoving };
+  return {
+    position,
+    direction,
+    isMoving,
+    touchHandlers: {
+      onTouchStart: handleTouchStart,
+      onTouchMove: handleTouchMove,
+      onTouchEnd: handleTouchEnd,
+    },
+  };
 };
 
 export const checkCollision = (rect1, rect2) => {

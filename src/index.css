@@ -9,11 +9,11 @@
 body {
   background: #f5f5f5;
   font-family: "Press Start 2P", cursive;
-
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
+/* ========== LOADING SCREEN ========== */
 .loading-screen {
   display: flex;
   flex-direction: column;
@@ -66,6 +66,7 @@ body {
   animation: spin 1s linear infinite;
 }
 
+/* ========== CHARACTER ========== */
 .character {
   position: absolute;
   width: 64px;
@@ -74,6 +75,7 @@ body {
   z-index: 10;
 }
 
+/* ========== HOME SCREEN ========== */
 .home-screen {
   position: relative;
   width: 100vw;
@@ -102,6 +104,7 @@ body {
   line-height: 1.8;
 }
 
+/* ========== GAME AREA ========== */
 .game-area {
   position: relative;
   width: 800px;
@@ -111,6 +114,7 @@ body {
   margin-top: 20px;
 }
 
+/* ========== FOLDERS ========== */
 .folder-container {
   position: absolute;
   display: flex;
@@ -225,6 +229,7 @@ body {
   }
 }
 
+/* ========== SECTION PAGES ========== */
 .section-page {
   padding: 40px;
   max-width: 900px;
@@ -245,6 +250,7 @@ body {
   color: #444;
 }
 
+/* ========== NAVIGATE BUTTON ========== */
 .navigate-btn {
   position: fixed;
   top: 20px;
@@ -266,6 +272,7 @@ body {
   box-shadow: 3px 3px 0 #333;
 }
 
+/* ========== PORTFOLIO ========== */
 .portfolio-stack {
   display: flex;
   flex-direction: column;
@@ -287,7 +294,6 @@ body {
 
 .project-card:hover {
   transform: translateY(-10px) scale(1.02);
-  /* z-index: 10; */
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -298,6 +304,7 @@ body {
   image-rendering: pixelated;
 }
 
+/* ========== SOCIAL LINKS ========== */
 .social-links {
   display: flex;
   justify-content: center;
@@ -323,6 +330,7 @@ body {
   box-shadow: 3px 3px 0 #333;
 }
 
+/* ========== PROFILE BADGE ========== */
 .profile-badge {
   display: flex;
   align-items: center;
@@ -343,19 +351,7 @@ body {
   border: 2px solid #fff;
 }
 
-@media (max-width: 900px) {
-  .game-area {
-    width: 90vw;
-    height: 300px;
-  }
-  .home-title {
-    font-size: 18px;
-  }
-  .home-subtitle {
-    font-size: 8px;
-  }
-}
-/* Modal animation */
+/* ========== MODAL ========== */
 @keyframes modalOpen {
   from {
     opacity: 0;
@@ -367,17 +363,368 @@ body {
   }
 }
 
-/* Apply to modal inner div */
 .modal-content {
   animation: modalOpen 0.3s ease;
 }
-@keyframes modalOpen {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
+
+/* ============================================================
+   MOBILE RESPONSIVE - max-width: 768px (tablets & phones)
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Home Screen */
+  .home-screen {
+    padding-top: 30px;
+    height: auto;
+    min-height: 100vh;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+
+  .home-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .home-subtitle {
+    font-size: 8px;
+    margin-bottom: 30px;
+    padding: 0 20px;
+    max-width: 100%;
+  }
+
+  /* Game Area - Scale down for mobile */
+  .game-area {
+    width: 95vw;
+    height: 250px;
+    margin-top: 10px;
+  }
+
+  /* Folders - Smaller on mobile */
+  .folder-icon {
+    width: 50px;
+    height: 40px;
+  }
+
+  .folder-icon::before {
+    width: 20px;
+    height: 10px;
+    top: -8px;
+  }
+
+  .folder-icon::after {
+    width: 50px;
+    height: 40px;
+  }
+
+  .folder-pages {
+    width: 45px;
+    height: 35px;
+    right: -5px;
+    top: 3px;
+  }
+
+  .folder-pages::before {
+    width: 45px;
+    height: 35px;
+    right: -4px;
+    top: -3px;
+  }
+
+  .folder-label {
+    font-size: 8px;
+    margin-top: 10px;
+  }
+
+  .folder-container:hover {
+    transform: scale(1.05);
+  }
+
+  /* Character - Smaller */
+  .character {
+    width: 40px;
+    height: 40px;
+  }
+
+  .character-loading {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Loading Screen */
+  .loading-text {
+    font-size: 16px;
+  }
+
+  .loading-bar-container {
+    width: 80vw;
+    max-width: 250px;
+  }
+
+  .loading-percentage {
+    font-size: 10px;
+  }
+
+  /* Section Pages */
+  .section-page {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .section-content {
+    font-size: 10px;
+    line-height: 1.8;
+  }
+
+  /* Navigate Button */
+  .navigate-btn {
+    padding: 8px 12px;
+    font-size: 8px;
+    top: 10px;
+    left: 10px;
+  }
+
+  /* Portfolio */
+  .portfolio-stack {
+    margin-top: 20px;
+  }
+
+  .project-card {
+    width: 90vw;
+    height: 80px;
+    margin-bottom: -25px;
+  }
+
+  .project-card:hover {
+    transform: translateY(-5px) scale(1.01);
+  }
+
+  /* Social Links */
+  .social-links {
+    gap: 15px;
+    margin-top: 40px;
+  }
+
+  .social-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .social-icon:hover {
+    transform: translateY(-3px);
+  }
+
+  /* Profile Badge */
+  .profile-badge {
+    padding: 10px 18px;
+    margin-top: 20px;
+  }
+
+  .profile-badge img {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Modal adjustments */
+  .modal-content {
+    max-width: 95vw;
+  }
+}
+
+/* ============================================================
+   SMALL PHONES - max-width: 480px
+   ============================================================ */
+@media (max-width: 480px) {
+  .home-title {
+    font-size: 14px;
+  }
+
+  .home-subtitle {
+    font-size: 7px;
+    line-height: 1.6;
+  }
+
+  .game-area {
+    height: 200px;
+  }
+
+  .folder-icon {
+    width: 40px;
+    height: 32px;
+  }
+
+  .folder-icon::before {
+    width: 16px;
+    height: 8px;
+  }
+
+  .folder-icon::after {
+    width: 40px;
+    height: 32px;
+  }
+
+  .folder-label {
+    font-size: 7px;
+  }
+
+  .character {
+    width: 32px;
+    height: 32px;
+  }
+
+  .loading-text {
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .project-card {
+    height: 70px;
+    margin-bottom: -20px;
+  }
+
+  .social-links {
+    gap: 12px;
+  }
+
+  .social-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+}
+
+/* ============================================================
+   LANDSCAPE PHONES - max-height: 500px
+   ============================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .home-screen {
+    padding-top: 15px;
+  }
+
+  .home-title {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .home-subtitle {
+    margin-bottom: 15px;
+  }
+
+  .game-area {
+    height: 200px;
+  }
+
+  .loading-text {
+    font-size: 14px;
+  }
+}
+
+/* ============================================================
+   EXISTING 900px BREAKPOINT (updated)
+   ============================================================ */
+@media (max-width: 900px) {
+  .game-area {
+    width: 90vw;
+    height: 300px;
+  }
+
+  .home-title {
+    font-size: 18px;
+  }
+
+  .home-subtitle {
+    font-size: 8px;
+  }
+}
+/* ========== PORTFOLIO MOBILE ========== */
+@media (max-width: 768px) {
+  .portfolio-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .portfolio-title {
+    font-size: 28px !important;
+    transform: rotate(-3deg) !important;
+    text-align: center;
+  }
+
+  .portfolio-subtitle {
+    text-align: center !important;
+    width: 100%;
+  }
+
+  .portfolio-content {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 30px !important;
+  }
+
+  .portfolio-character {
+    width: 100% !important;
+    margin-top: 20px !important;
+  }
+
+  .portfolio-character p {
+    margin-left: 0 !important;
+    margin-top: 40px !important;
+  }
+
+  .portfolio-stack {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+
+  .project-card {
+    width: 100% !important;
+    height: 100px !important;
+    margin-bottom: -20px !important;
+  }
+
+  .modal-image {
+    height: 200px !important;
+  }
+
+  .modal-body {
+    padding: 15px !important;
+  }
+
+  .modal-body h2 {
+    font-size: 16px !important;
+  }
+
+  .modal-body p {
+    font-size: 10px !important;
+  }
+
+  .modal-link {
+    font-size: 10px !important;
+    padding: 8px 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-title {
+    font-size: 20px !important;
+  }
+
+  .portfolio-subtitle p {
+    font-size: 10px !important;
+  }
+
+  .project-card {
+    height: 80px !important;
+  }
+
+  .modal-image {
+    height: 150px !important;
   }
 }
