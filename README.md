@@ -68,3 +68,142 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+import React, { useState, useEffect, useCallback } from "react";
+import Character from "./Character";
+import Folder from "./Folder";
+import {
+  useKeyboardMovement,
+  checkCollision,
+} from "../hooks/useSpriteAnimation";
+
+const GAME_WIDTH = 800;
+const GAME_HEIGHT = 400;
+
+const folders = [
+  {
+    id: "about",
+    label: "About Me",
+    color: "blue",
+    position: { x: 100, y: 280 },
+    path: "/about",
+  },
+  {
+    id: "portfolio",
+    label: "Portfolio",
+    color: "red",
+    position: { x: 360, y: 280 },
+    path: "/portfolio",
+  },
+  {
+    id: "contact",
+    label: "Contact Me",
+    color: "yellow",
+    position: { x: 620, y: 280 },
+    path: "/contact",
+  },
+];
+
+const HomeScreen = ({ onNavigate }) => {
+  const { position, direction, isMoving } = useKeyboardMovement(4, {
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT,
+  });
+  const [highlightedFolder, setHighlightedFolder] = useState(null);
+  const [collisionTimer, setCollisionTimer] = useState(0);
+
+  useEffect(() => {
+    const charRect = { x: position.x, y: position.y, width: 64, height: 64 };
+    let collidedFolder = null;
+    folders.forEach((folder) => {
+      const folderRect = {
+        x: folder.position.x,
+        y: folder.position.y,
+        width: 80,
+        height: 80,
+      };
+      if (checkCollision(charRect, folderRect)) {
+        collidedFolder = folder;
+      }
+    });
+
+    setHighlightedFolder(collidedFolder);
+
+    if (collidedFolder) {
+      setCollisionTimer((prev) => {
+        const newTimer = prev + 1;
+        if (newTimer > 90) {
+          onNavigate(collidedFolder.path);
+          return 0;
+        }
+        return newTimer;
+      });
+    } else {
+      setCollisionTimer(0);
+    }
+  }, [position, onNavigate]);
+
+  const handleFolderClick = useCallback(
+    (path) => {
+      onNavigate(path);
+    },
+    [onNavigate],
+  );
+
+  return (
+    <div className="home-screen">
+      <h1 className="home-title">ROJIT ARYAL</h1>
+      <p className="home-subtitle">
+        START BY WALKING OVER DESIRED MODE OR CLICK
+      </p>
+
+      <div
+        className="game-area"
+        style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}
+      >
+        <Character
+          position={position}
+          direction={direction}
+          isMoving={isMoving}
+        />
+        {folders.map((folder) => (
+          <Folder
+            key={folder.id}
+            label={folder.label}
+            color={folder.color}
+            position={folder.position}
+            isHighlighted={highlightedFolder?.id === folder.id}
+            onClick={() => handleFolderClick(folder.path)}
+          />
+        ))}
+        {highlightedFolder && (
+          <div
+            style={{
+              position: "absolute",
+              left: highlightedFolder.position.x,
+              top: highlightedFolder.position.y - 20,
+              width: 80,
+              height: 6,
+              background: "#ddd",
+              border: "2px solid #333",
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.min((collisionTimer / 90) * 100, 100)}%`,
+                height: "100%",
+                background: "#4CAF50",
+                transition: "width 0.1s",
+              }}
+            />
+          </div>
+        )}
+      </div>
+      <div style={{ marginTop: 20, fontSize: 10, color: "#999" }}>
+        Use WASD or Arrow Keys to move
+      </div>
+    </div>
+  );
+};
+
+export default HomeScreen;
