@@ -32,6 +32,16 @@ const projects = [
     link: "https://drive.google.com/drive/folders/1_aO6yzPQlZsG1fzBdEE1SORDaBDAfbaW",
     tech: ["Photoshop", "Premiere Pro", "Illustrator"],
   },
+  {
+    id: 4,
+    title: "sports time converter",
+    image: "/time.png",
+    fullImage: "/time.png",
+    description:
+      "A simple sports time converter that converts time from one timezone to another. Built with React and Node.js. built to try API calls and learn about timezones.",
+    link: "https://samayeeinepali.vercel.app/",
+    tech: ["React", "node.js", "MongoDB"],
+  },
 ];
 
 // Detect mobile
